@@ -1,19 +1,28 @@
-import { signInWithPopup, auth, provider } from "./firebase";
+import { loginWithGoogle } from "./firebase";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
 function Login({ onLogin }) {
   const [error, setError] = useState(null);
 
-  const handleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      onLogin(result.user);
-    } catch (err) {
-      console.error("Login failed:", err);
-      setError("שגיאה בהתחברות");
-    }
-  };
+  const [loading, setLoading] = useState(false);
+
+const handleLogin = async () => {
+  if (loading) return; // מונע לחיצה כפולה
+  setLoading(true);
+
+  try {
+    const result = await loginWithGoogle();
+    const user = result.user;
+    onLogin(user);
+  } catch (err) {
+    console.error("שגיאה בהתחברות:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  
 
   return (
     <motion.div
@@ -21,13 +30,18 @@ function Login({ onLogin }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7 }}
       style={{
-        textAlign: "center",
-        backgroundColor: "#ffffff",
+        direction: "rtl",        // יישור לימין
+        textAlign: "center",     // ממרכז טקסט וכפתורים
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         padding: "40px",
+        backgroundColor: "#fff",
         borderRadius: "20px",
         boxShadow: "0 12px 30px rgba(0,0,0,0.1)",
-        maxWidth: "550px",
         width: "90%",
+        maxWidth: "500px",
       }}
     >
       {/* כותרת */}
