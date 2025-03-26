@@ -2,6 +2,7 @@ import { useState } from "react";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 import NewBet from "./NewBet"; // 👈 אל תשכח לייבא
+import DashboardApp from "./DashboardApp";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -32,7 +33,7 @@ function App() {
   }
 
   return (
-    <Dashboard
+    <DashboardApp
       user={user}
       onLogout={() => setUser(null)}
       onCreateBet={() => setShowNewBet(true)}
