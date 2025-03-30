@@ -1,6 +1,8 @@
 // src/firebase.js
 
 import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+
 import {
   getAuth,
   GoogleAuthProvider,
@@ -23,6 +25,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+const db = getFirestore(app);
 
 // ✅ עטוף את ההתחברות ככה כדי שיזכור את המשתמש
 const loginWithGoogle = async () => {
@@ -30,4 +33,4 @@ const loginWithGoogle = async () => {
   return signInWithPopup(auth, provider);
 };
 
-export { auth, provider, loginWithGoogle, signOut };
+export { auth, provider, loginWithGoogle, signOut, db };

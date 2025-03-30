@@ -1,44 +1,60 @@
-import { useState } from "react";
-import Login from "../Login";
-import Dashboard from "./Dashboard";
-import NewBet from "./NewBet"; // 👈 אל תשכח לייבא
-import DashboardApp from "../pages/DashboardApp";
+import { useEffect, useState } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../mainPart/firebase";
+
+import Login from "./Login";
+import Dashboard from "../mainPart/Dashboard";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [showNewBet, setShowNewBet] = useState(false); // ⬅️ ניהול מצב התערבות חדשה
+  const [loading, setLoading] = useState(true);
+  const [hasNickname, setHasNickname] = useState(false);
 
-  if (!user) {
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        setUser(firebaseUser);
+        const userRef = doc(db, "users", firebaseUser.uid);
+        const userSnap = await getDoc(userRef);
+
+        const nickname = userSnap.data()?.nickname?.trim();
+        setHasNickname(!!nickname);
+      } else {
+        setUser(null);
+        setHasNickname(false);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) return <div>טוען...</div>;
+
+  if (!user || !hasNickname) {
     return (
-      <div style={{
-        height: "100vh",
-        width: "100vw",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        direction: "rtl",
-        background: "#e0f2ff", // רקע אחיד ונעים
-      }}>
-        <Login onLogin={setUser} />
+      <div
+        style={{
+          height: "100vh",
+          width: "100vw",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          direction: "rtl",
+          background: "#e0f2ff",
+        }}
+      >
+        <Login onLogin={(u) => {
+          setUser(u);
+          setHasNickname(true);
+        }} />
       </div>
     );
   }
-  
-  
 
-  if (showNewBet) {
-    return (
-      <NewBet user={user} onBack={() => setShowNewBet(false)} />
-    );
-  }
-
-  return (
-    <DashboardApp
-      user={user}
-      onLogout={() => setUser(null)}
-      onCreateBet={() => setShowNewBet(true)}
-    />
-  );
+  return <Dashboard user={user} onLogout={() => setUser(null)} />;
 }
 
 export default App;

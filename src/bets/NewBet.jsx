@@ -1,4 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../mainPart/firebase";
+import SmartStep from "./SmartStep";
+
+const progressPercents = {
+  1: 25,
+  2: 50,
+  3: 75,
+  4: 100,
+};
 
 const NewBet = ({ onBack, onFinish }) => {
   const [step, setStep] = useState(1);
@@ -10,6 +21,9 @@ const NewBet = ({ onBack, onFinish }) => {
     judge: "",
     notes: "",
   });
+  const [useDate, setUseDate] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -22,126 +36,179 @@ const NewBet = ({ onBack, onFinish }) => {
     }));
   };
 
-  const handleNext = () => {
-    setStep((s) => s + 1);
+  const handleNext = () => setStep((s) => s + 1);
+  const handlePrev = () => (step === 1 ? onBack() : setStep((s) => s - 1));
+
+  const handleFinish = () => {
+    const finalDeadline = useDate ? form.deadline : form.smart.T;
+    const finalForm = { ...form, deadline: finalDeadline };
+    onFinish(finalForm);
   };
 
-  const handlePrev = () => {
-    if (step === 1) {
-      onBack();
+  const searchUsers = async (queryText) => {
+    const q = query(
+      collection(db, "users"),
+      where("nickname", ">=", queryText),
+      where("nickname", "<=", queryText + "\uf8ff")
+    );
+    const snapshot = await getDocs(q);
+    const results = snapshot.docs.map(doc => doc.data());
+    setSearchResults(results);
+  };
+  
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchQuery.trim() !== "") searchUsers(searchQuery);
+      else setSearchResults([]);
+    }, 500);
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
+
+  const handleSearchChange = (e) => {
+    const queryText = e.target.value;
+    setSearchQuery(queryText);
+  
+    if (queryText.startsWith("@")) {
+      const searchText = queryText.slice(1);  // הסרת ה-@ מהחיפוש
+      if (searchText) {
+        searchUsers(searchText);  // חיפוש אחרי nickname
+      } else {
+        setSearchResults([]);  // אם לא הוקלד שום דבר אחרי @, לא להציג תוצאות
+      }
     } else {
-      setStep((s) => s - 1);
+      setSearchResults([]);  // אם אין @, לא לבצע חיפוש
     }
   };
-
-  console.log("Current Step:", step);
+  
+  
+  const addParticipant = (nickname, isFake = false) => {
+    if (!form.participants.some(p => p.nickname === nickname)) {
+      setForm((prev) => ({
+        ...prev,
+        participants: [...prev.participants, { nickname, isFake }],
+      }));
+    }
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+  
+  
 
   return (
-    <div style={styles.container}>
-      {step === 1 && (
-        <div>
-          <h2 style={styles.title}>type name...</h2>
-          <p style={styles.subtitle}>#1 Define the competition end goal</p>
-          <input
-            placeholder="Eat less sugar, Exercise 3x..."
-            value={form.title}
-            onChange={(e) => handleChange("title", e.target.value)}
-            style={styles.input}
-          />
-          <div style={styles.navRow}>
-            <button onClick={handlePrev} style={styles.backButton}>Back</button>
-            <button onClick={handleNext} style={styles.button}>Next</button>
-          </div>
-        </div>
-      )}
+    <div style={{ ...styles.container, background: "linear-gradient(to bottom right, #e0f7ff, #ffffff)" }}>
+      <div style={styles.progressBarOuter}>
+        <div style={{ ...styles.progressBarInner, width: `${progressPercents[step]}%` }}></div>
+      </div>
 
-      {step === 2 && (
-        <div>
-          <h2 style={styles.title}>SMART Goal Setup</h2>
-          {Object.entries({
-            S: "Specific - What exactly?",
-            M: "Measurable - How to measure?",
-            A: "Achievable - Can you do it?",
-            R: "Relevant - Why important?",
-            T: "Time-bound - When to finish?",
-          }).map(([key, label]) => (
-            <div key={key} style={{ marginBottom: 10 }}>
-              <label>{label}</label>
+      <AnimatePresence mode="wait">
+        {step === 1 && (
+          <motion.div key="step1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <h2 style={styles.title}>📝 Name your challenge</h2>
+            <p style={styles.subtitle}>Give your bet a meaningful title</p>
+            <input
+              placeholder="e.g. No sugar for 10 days"
+              value={form.title}
+              onChange={(e) => handleChange("title", e.target.value)}
+              style={styles.input}
+              required
+            />
+            <div style={styles.navRow}>
+              <button onClick={handlePrev} style={styles.backButton}>Back</button>
+              <button onClick={handleNext} style={styles.button}>Next</button>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 2 && (
+          <motion.div key="step2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <SmartStep smart={form.smart} onSmartChange={handleSmartChange} />
+
+            <label style={{ marginTop: 8 }}>📅 Or set a specific date:</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <input
-                placeholder={label}
-                value={form.smart[key]}
-                onChange={(e) => handleSmartChange(key, e.target.value)}
+                type="checkbox"
+                checked={useDate}
+                onChange={() => setUseDate(!useDate)}
+              />
+              <input
+                type="date"
+                disabled={!useDate}
+                value={form.deadline}
+                onChange={(e) => handleChange("deadline", e.target.value)}
                 style={styles.input}
               />
             </div>
-          ))}
 
-          <label>Finish in:</label>
-          <select
-            value={form.deadline}
-            onChange={(e) => handleChange("deadline", e.target.value)}
-            style={styles.input}
-          >
-            <option value="1 week">1 week</option>
-            <option value="2 weeks">2 weeks</option>
-            <option value="1 month">1 month</option>
-          </select>
+            <div style={styles.navRow}>
+              <button onClick={handlePrev} style={styles.backButton}>Back</button>
+              <button onClick={handleNext} style={styles.button}>Next</button>
+            </div>
+          </motion.div>
+        )}
 
-          <label>Or choose a date:</label>
-          <input
-            type="date"
-            onChange={(e) => handleChange("deadline", e.target.value)}
-            style={styles.input}
-          />
+        {step === 3 && (
+          <motion.div key="step3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <h2 style={styles.title}>👥 Choose Opponent</h2>
+            <input
+              placeholder="Search by username"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={styles.input}
+            />
+            {searchResults.length > 0 ? (
+              searchResults.map((user, idx) => (
+                <div key={idx} style={styles.suggestionItem} onClick={() => addParticipant(user.username)}>
+                  ✅ @{user.username}
+                </div>
+              ))
+            ) : (
+              searchQuery && (
+                <div style={styles.suggestionItem} onClick={() => addParticipant(searchQuery, true)}>
+                  ➕ Add '{searchQuery}' anyway
+                </div>
+              )
+            )}
+            <p>Selected:
+              {form.participants.map((p, i) => (
+                <span key={i} style={{ marginInline: 4 }}>
+                  @{p.username} {p.isFake ? "🌈" : ""}
+                </span>
+              ))}
+            </p>
+            <div style={styles.navRow}>
+              <button onClick={handlePrev} style={styles.backButton}>Back</button>
+              <button onClick={handleNext} style={styles.button}>Next</button>
+            </div>
+          </motion.div>
+        )}
 
-          <div style={styles.navRow}>
-            <button onClick={handlePrev} style={styles.backButton}>Back</button>
-            <button onClick={handleNext} style={styles.button}>Next</button>
-          </div>
-        </div>
-      )}
+        {step === 4 && (
+          <motion.div key="step4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <h2 style={styles.title}>📌 Final Details</h2>
+            <label>Assign a Judge (optional):</label>
+            <input
+              placeholder="e.g. @username or bot"
+              value={form.judge}
+              onChange={(e) => handleChange("judge", e.target.value)}
+              style={styles.input}
+            />
 
-      {step === 3 && (
-        <div>
-          <h2 style={styles.title}>Choose Participants</h2>
-          <p style={styles.subtitle}>Coming soon: searchable friends list</p>
-          <input
-            placeholder="Add usernames or emails..."
-            onChange={(e) => handleChange("participants", e.target.value.split(","))}
-            style={styles.input}
-          />
-          <div style={styles.navRow}>
-            <button onClick={handlePrev} style={styles.backButton}>Back</button>
-            <button onClick={handleNext} style={styles.button}>Next</button>
-          </div>
-        </div>
-      )}
+            <label>Additional Notes:</label>
+            <textarea
+              placeholder="Describe punishments, rewards, or rules"
+              value={form.notes}
+              onChange={(e) => handleChange("notes", e.target.value)}
+              style={styles.input}
+            />
 
-      {step === 4 && (
-        <div>
-          <h2 style={styles.title}>Final Touches</h2>
-          <label>Choose Judge (or leave blank):</label>
-          <input
-            placeholder="@username or 'bot'"
-            value={form.judge}
-            onChange={(e) => handleChange("judge", e.target.value)}
-            style={styles.input}
-          />
-
-          <label>Notes / rules / conditions:</label>
-          <textarea
-            placeholder="Describe punishment, reward, rules..."
-            value={form.notes}
-            onChange={(e) => handleChange("notes", e.target.value)}
-            style={styles.input}
-          />
-
-          <div style={styles.navRow}>
-            <button onClick={handlePrev} style={styles.backButton}>Back</button>
-            <button onClick={() => onFinish(form)} style={styles.button}>Finish 🎉</button>
-          </div>
-        </div>
-      )}
+            <div style={styles.navRow}>
+              <button onClick={handlePrev} style={styles.backButton}>Back</button>
+              <button onClick={handleFinish} style={styles.button}>Finish 🎉</button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -149,15 +216,16 @@ const NewBet = ({ onBack, onFinish }) => {
 const styles = {
   container: {
     padding: "20px",
-    backgroundColor: "#e0f2fe",
     minHeight: "100vh",
     maxWidth: "480px",
     margin: "0 auto",
+    borderRadius: "16px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
   },
   title: {
-    fontSize: "20px",
+    fontSize: "22px",
     fontWeight: "bold",
-    color: "#2563eb",
+    color: "#1e40af",
     marginBottom: "10px",
     textAlign: "center",
   },
@@ -193,6 +261,26 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     marginTop: "10px",
+  },
+  suggestionItem: {
+    backgroundColor: "#f0f9ff",
+    padding: "8px 12px",
+    marginBottom: "6px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    border: "1px solid #ccc",
+  },
+  progressBarOuter: {
+    height: "6px",
+    backgroundColor: "#e5e7eb",
+    borderRadius: "4px",
+    overflow: "hidden",
+    marginBottom: "20px",
+  },
+  progressBarInner: {
+    height: "100%",
+    backgroundColor: "#3b82f6",
+    transition: "width 0.3s ease",
   },
 };
 

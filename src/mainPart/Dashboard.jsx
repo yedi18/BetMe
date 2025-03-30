@@ -1,310 +1,136 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
+import NewBet from "../bets/NewBet";
+import BetDetails from "../bets/BetDetails";
+import UpdateBet from "../bets/UpdateBet";
+import ProfilePage from "../pages/ProfilePage";
+import SettingsPage from "../pages/SettingsPage";
+import MainDashboardView from "./MainDashboardView";
 
-function Dashboard({ user, onLogout, onCreateBet, bets = [], onBetClick, onEditBet }) {
+export default function Dashboard({ user, onLogout }) {
+  const [page, setPage] = useState("home");
+  const [bets, setBets] = useState([]);
+  const [selectedBet, setSelectedBet] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleLogout = async () => {
     await signOut(auth);
     onLogout();
   };
 
-  const grit = 87;
+  const handleNewBetFinish = (data) => {
+    const newBet = {
+      title: data.title,
+      status: "In Progress",
+      opponent: data.participants?.[0] || "Unknown",
+      opponentPhoto: "/default-avatar.png",
+      yourProgress: 0,
+      opponentProgress: 0,
+      date: data.deadline || "TBD",
+      isNew: true,
+    };
+    setBets((prev) => [...prev, newBet]);
+    setPage("home");
+    setShowSuccess(true);
+  };
+
+  useEffect(() => {
+    if (showSuccess) {
+      const timer = setTimeout(() => setShowSuccess(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccess]);
+
+  const renderPage = () => {
+    switch (page) {
+      case "home":
+        return (
+          <MainDashboardView
+            user={user}
+            bets={bets}
+            onCreateBet={() => setPage("newbet")}
+            onEditBet={(bet) => {
+              setSelectedBet(bet);
+              setPage("stats");
+            }}
+            onBetClick={(bet) => {
+              setSelectedBet(bet);
+              setPage("bets");
+            }}
+            onLogout={handleLogout}
+            menuOpen={menuOpen}
+            setMenuOpen={setMenuOpen}
+          />
+        );
+      case "newbet":
+        return <NewBet onBack={() => setPage("home")} onFinish={handleNewBetFinish} />;
+      case "bets":
+        return (
+          <>
+            <button onClick={() => setPage("home")} style={styles.backButton}>⬅ Back</button>
+            <BetDetails bet={selectedBet} />
+          </>
+        );
+      case "stats":
+        return (
+          <>
+            <button onClick={() => setPage("home")} style={styles.backButton}>⬅ Back</button>
+            <UpdateBet bet={selectedBet} />
+          </>
+        );
+      case "profile":
+        return <ProfilePage user={user} onLogout={handleLogout} />;
+      case "settings":
+        return <SettingsPage />;
+      default:
+        return <div>Page not found</div>;
+    }
+  };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        {/* תפריט עליון */}
-        <div style={styles.topBar}>
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              style={styles.menuButton}
-              aria-label="Options"
-            >
-              ⋮
-            </button>
-            {menuOpen && (
-              <div style={styles.dropdown}>
-                <button onClick={handleLogout} style={styles.dropdownItem}>
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* עיגולים צבעוניים */}
-        <div style={styles.circlesRow}>
-          {["#f87171", "#f472b6", "#4ade80", "#facc15", "#38bdf8"].map((color, idx) => (
-            <div key={idx} style={{ ...styles.circle, backgroundColor: color }} />
-          ))}
-        </div>
-
-        {/* כותרת וברוכים הבאים */}
-        <h1 style={styles.title}>
-          Welcome to <span style={styles.brand}>BetMe 🎉</span>
-        </h1>
-        <p style={styles.motivation}>Your goal is in your hands 💪</p>
-        <p style={styles.dailyTip}>💡 Tip of the day: Invite a friend and make a fun bet!</p>
-
-        {/* תמונת משתמש + grit */}
-        <div style={{ position: "relative", display: "inline-block", marginBottom: 12 }}>
-          <img
-            src={user?.photoURL?.trim() !== "" ? user.photoURL : "/default-avatar.png"}
-            alt="User"
-            style={styles.avatar}
-          />
-          <div style={styles.gritBadge}>{grit}<br /><span style={{ fontSize: 10 }}>grit</span></div>
-        </div>
-
-        <h2 style={styles.name}>Hello, {user.displayName} 👋</h2>
-
-        {/* כפתור יצירת התערבות */}
-        <button style={styles.newBetButton} onClick={onCreateBet}>
-          ➕ Create New Bet
-        </button>
-
-        {/* רשימת התערבויות */}
-        <h3 style={styles.sectionTitle}>🎯 Your Bets</h3>
-        <div style={styles.betsGrid}>
-          {bets.length === 0 ? (
-            <p style={{ color: "#888" }}>No bets yet. Create your first challenge!</p>
-          ) : (
-            bets.map((bet, index) => (
-              <div key={index} style={styles.betCard}>
-                <div style={styles.cardHeader}>
-                  <p style={styles.betTitle}>{bet.title}</p>
-                  <div>
-                    <button style={styles.cardButton} onClick={() => onEditBet(bet)}>✏️</button>
-                    <button style={styles.cardButton} onClick={() => onBetClick(bet)}>🔍</button>
-                  </div>
-                </div>
-                <p style={styles.betMeta}>vs. {bet.opponent} · {bet.date}</p>
-                <div style={styles.progressSection}>
-                  <p style={styles.progressLabel}>Your Progress</p>
-                  <div style={styles.progressBarWrapper}>
-                    <div style={{ ...styles.progressBar, width: `${bet.yourProgress}%`, backgroundColor: "#3b82f6" }} />
-                  </div>
-
-                  <p style={styles.progressLabel}>Opponent</p>
-                  <div style={styles.progressBarWrapper}>
-                    <div style={{ ...styles.progressBar, width: `${bet.opponentProgress}%`, backgroundColor: "#facc15" }} />
-                  </div>
-                </div>
-                <span style={{ ...styles.statusBadge, ...getStatusStyle(bet.status) }}>{bet.status}</span>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+    <div style={styles.wrapper}>
+      {showSuccess && <div style={styles.successToast}>🎉 New Bet Created Successfully!</div>}
+      <div style={styles.content}>{renderPage()}</div>
     </div>
   );
 }
 
-const getStatusStyle = (status) => {
-  switch (status) {
-    case "Completed":
-      return { backgroundColor: "#bbf7d0", color: "#15803d" };
-    case "Failed":
-      return { backgroundColor: "#fecaca", color: "#b91c1c" };
-    case "In Progress":
-      return { backgroundColor: "#fef08a", color: "#92400e" };
-    default:
-      return {};
-  }
-};
-
 const styles = {
-  container: {
+  wrapper: {
     minHeight: "100vh",
-    background: "linear-gradient(to bottom right, #e0f2fe, #ffffff)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "20px",
-  },
-  card: {
-    backgroundColor: "#fff",
-    padding: "30px",
-    borderRadius: "20px",
-    boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
-    textAlign: "center",
-    width: "100%",
-    maxWidth: "600px",
-    position: "relative",
-  },
-  topBar: {
-    display: "flex",
-    justifyContent: "flex-end",
-    marginBottom: "8px",
-  },
-  menuButton: {
-    background: "none",
-    border: "none",
-    fontSize: "24px",
-    cursor: "pointer",
-  },
-  dropdown: {
-    position: "absolute",
-    top: "30px",
-    right: "0",
-    background: "#fff",
-    border: "1px solid #ccc",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-    zIndex: 999,
-  },
-  dropdownItem: {
-    padding: "10px 20px",
-    fontSize: "14px",
-    background: "white",
-    border: "none",
-    cursor: "pointer",
-    width: "100%",
-    textAlign: "left",
-  },
-  circlesRow: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "10px",
-    marginBottom: "16px",
-  },
-  circle: {
-    width: "20px",
-    height: "20px",
-    borderRadius: "50%",
-  },
-  title: {
-    fontSize: "22px",
-    color: "#1e3a8a",
-    marginBottom: "4px",
-  },
-  brand: {
-    color: "#2563eb",
-    fontWeight: "bold",
-  },
-  motivation: {
-    fontSize: "16px",
-    color: "#1e40af",
-    marginBottom: "6px",
-  },
-  dailyTip: {
-    fontSize: "14px",
-    color: "#0f172a",
-    fontStyle: "italic",
-    marginBottom: "16px",
-  },
-  avatar: {
-    width: "90px",
-    height: "90px",
-    borderRadius: "50%",
-    objectFit: "cover",
-  },
-  gritBadge: {
-    position: "absolute",
-    top: "0",
-    right: "-10px",
-    backgroundColor: "#4ade80",
-    color: "#065f46",
-    borderRadius: "50%",
-    padding: "6px",
-    fontSize: "14px",
-    fontWeight: "bold",
-    width: "40px",
-    height: "40px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-  },
-  name: {
-    margin: "10px 0",
-    fontSize: "20px",
-    color: "#1e40af",
-  },
-  newBetButton: {
-    padding: "12px 24px",
-    backgroundColor: "#2563eb",
-    color: "#fff",
-    border: "none",
-    borderRadius: "12px",
-    fontSize: "16px",
-    marginBottom: "20px",
-    cursor: "pointer",
-  },
-  sectionTitle: {
-    fontSize: "18px",
-    color: "#111",
-    fontWeight: "bold",
-    marginBottom: "12px",
-    textAlign: "left",
-  },
-  betsGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr",
-    gap: "12px",
-    textAlign: "left",
-  },
-  betCard: {
-    backgroundColor: "#f8fafc",
-    borderRadius: "12px",
-    padding: "16px",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+    backgroundColor: "#f9fafb",
     position: "relative",
   },
-  cardHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "6px",
+  content: {
+    width: "100%",
+    maxWidth: "600px",
   },
-  cardButton: {
-    background: "none",
+  backButton: {
+    alignSelf: "flex-start",
+    margin: "10px",
+    padding: "6px 12px",
+    fontSize: "14px",
+    borderRadius: "8px",
+    backgroundColor: "#e5e7eb",
     border: "none",
     cursor: "pointer",
-    fontSize: "16px",
-    marginLeft: "6px",
   },
-  betTitle: {
-    fontSize: "16px",
-    fontWeight: "600",
-    marginBottom: "4px",
-  },
-  betMeta: {
-    fontSize: "14px",
-    color: "#64748b",
-    marginBottom: "6px",
-  },
-  progressSection: {
-    marginBottom: "6px",
-  },
-  progressLabel: {
-    fontSize: "12px",
-    marginTop: "4px",
-    color: "#475569",
-  },
-  progressBarWrapper: {
-    height: "6px",
-    backgroundColor: "#e2e8f0",
-    borderRadius: "4px",
-    overflow: "hidden",
-    marginBottom: "6px",
-  },
-  progressBar: {
-    height: "100%",
-  },
-  statusBadge: {
-    position: "absolute",
-    top: "16px",
-    right: "16px",
-    padding: "4px 10px",
-    borderRadius: "999px",
-    fontSize: "12px",
+  successToast: {
+    position: "fixed",
+    top: "20px",
+    backgroundColor: "#4ade80",
+    color: "#065f46",
+    padding: "12px 24px",
+    borderRadius: "12px",
     fontWeight: "bold",
-    whiteSpace: "nowrap",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    zIndex: 1000,
+    animation: "fadeIn 0.3s ease-in-out",
   },
 };
-
-export default Dashboard;
