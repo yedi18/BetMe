@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
 
-function Dashboard({ user, onLogout, onCreateBet, bets = [], onBetClick }) {
+function Dashboard({ user, onLogout, onCreateBet, bets = [], onBetClick, onEditBet }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -10,37 +10,7 @@ function Dashboard({ user, onLogout, onCreateBet, bets = [], onBetClick }) {
     onLogout();
   };
 
-  <h3 style={styles.sectionTitle}>🎯 Your Bets</h3>
-
-{bets.length === 0 ? (
-  <p style={{ color: "#888" }}>No bets yet. Create your first challenge!</p>
-) : (
-  bets.map((bet, index) => (
-    <div key={index} style={styles.betCard}>
-      <div style={styles.betRow}>
-        <img src={bet.opponentPhoto || "/default-avatar.png"} alt={bet.opponent} style={styles.opponentAvatar} />
-        <div style={{ flex: 1, marginLeft: "10px" }}>
-          <p style={styles.betTitle}>{bet.title}</p>
-          <p style={styles.betMeta}>vs. {bet.opponent} · {bet.date}</p>
-
-          <p style={styles.progressLabel}>Your Progress</p>
-          <div style={styles.progressBarWrapper}>
-            <div style={{ ...styles.progressBar, width: `${bet.yourProgress}%`, backgroundColor: "#3b82f6" }} />
-          </div>
-
-          <p style={styles.progressLabel}>Opponent</p>
-          <div style={styles.progressBarWrapper}>
-            <div style={{ ...styles.progressBar, width: `${bet.opponentProgress}%`, backgroundColor: "#facc15" }} />
-          </div>
-        </div>
-        <span style={{ ...styles.statusBadge, ...getStatusStyle(bet.status) }}>{bet.status}</span>
-      </div>
-    </div>
-  ))
-)}
-
-
-  const grit = 87; // לדוגמה
+  const grit = 87;
 
   return (
     <div style={styles.container}>
@@ -98,28 +68,36 @@ function Dashboard({ user, onLogout, onCreateBet, bets = [], onBetClick }) {
 
         {/* רשימת התערבויות */}
         <h3 style={styles.sectionTitle}>🎯 Your Bets</h3>
-        {bets.map((bet, index) => (
-          <div key={index} style={styles.betCard}>
-            <div style={styles.betRow}>
-              <img src={bet.opponentPhoto} alt={bet.opponent} style={styles.opponentAvatar} />
-              <div style={{ flex: 1, marginLeft: "10px" }}>
-                <p style={styles.betTitle}>{bet.title}</p>
+        <div style={styles.betsGrid}>
+          {bets.length === 0 ? (
+            <p style={{ color: "#888" }}>No bets yet. Create your first challenge!</p>
+          ) : (
+            bets.map((bet, index) => (
+              <div key={index} style={styles.betCard}>
+                <div style={styles.cardHeader}>
+                  <p style={styles.betTitle}>{bet.title}</p>
+                  <div>
+                    <button style={styles.cardButton} onClick={() => onEditBet(bet)}>✏️</button>
+                    <button style={styles.cardButton} onClick={() => onBetClick(bet)}>🔍</button>
+                  </div>
+                </div>
                 <p style={styles.betMeta}>vs. {bet.opponent} · {bet.date}</p>
+                <div style={styles.progressSection}>
+                  <p style={styles.progressLabel}>Your Progress</p>
+                  <div style={styles.progressBarWrapper}>
+                    <div style={{ ...styles.progressBar, width: `${bet.yourProgress}%`, backgroundColor: "#3b82f6" }} />
+                  </div>
 
-                <p style={styles.progressLabel}>Your Progress</p>
-                <div style={styles.progressBarWrapper}>
-                  <div style={{ ...styles.progressBar, width: `${bet.yourProgress}%`, backgroundColor: "#3b82f6" }} />
+                  <p style={styles.progressLabel}>Opponent</p>
+                  <div style={styles.progressBarWrapper}>
+                    <div style={{ ...styles.progressBar, width: `${bet.opponentProgress}%`, backgroundColor: "#facc15" }} />
+                  </div>
                 </div>
-
-                <p style={styles.progressLabel}>Opponent</p>
-                <div style={styles.progressBarWrapper}>
-                  <div style={{ ...styles.progressBar, width: `${bet.opponentProgress}%`, backgroundColor: "#facc15" }} />
-                </div>
+                <span style={{ ...styles.statusBadge, ...getStatusStyle(bet.status) }}>{bet.status}</span>
               </div>
-              <span style={{ ...styles.statusBadge, ...getStatusStyle(bet.status) }}>{bet.status}</span>
-            </div>
-          </div>
-        ))}
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
@@ -154,7 +132,7 @@ const styles = {
     boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
     textAlign: "center",
     width: "100%",
-    maxWidth: "500px",
+    maxWidth: "600px",
     position: "relative",
   },
   topBar: {
@@ -261,24 +239,33 @@ const styles = {
     color: "#111",
     fontWeight: "bold",
     marginBottom: "12px",
+    textAlign: "left",
+  },
+  betsGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr",
+    gap: "12px",
+    textAlign: "left",
   },
   betCard: {
     backgroundColor: "#f8fafc",
     borderRadius: "12px",
-    padding: "14px",
-    marginBottom: "12px",
-    textAlign: "left",
+    padding: "16px",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+    position: "relative",
   },
-  betRow: {
+  cardHeader: {
     display: "flex",
-    alignItems: "flex-start",
-    gap: "10px",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "6px",
   },
-  opponentAvatar: {
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    objectFit: "cover",
+  cardButton: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "16px",
+    marginLeft: "6px",
   },
   betTitle: {
     fontSize: "16px",
@@ -288,6 +275,9 @@ const styles = {
   betMeta: {
     fontSize: "14px",
     color: "#64748b",
+    marginBottom: "6px",
+  },
+  progressSection: {
     marginBottom: "6px",
   },
   progressLabel: {
@@ -306,12 +296,14 @@ const styles = {
     height: "100%",
   },
   statusBadge: {
+    position: "absolute",
+    top: "16px",
+    right: "16px",
     padding: "4px 10px",
     borderRadius: "999px",
     fontSize: "12px",
     fontWeight: "bold",
     whiteSpace: "nowrap",
-    alignSelf: "flex-start",
   },
 };
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Dashboard from "./Dashboard";
+import Dashboard from "../mainPart/Dashboard";
 import BetDetails from "./BetDetails";
 import UpdateBet from "./UpdateBet";
 import ProfilePage from "./ProfilePage";
