@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
 
-function Dashboard({ user, onLogout, onCreateBet }) {
+function Dashboard({ user, onLogout, onCreateBet, bets = [], onBetClick }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -10,35 +10,35 @@ function Dashboard({ user, onLogout, onCreateBet }) {
     onLogout();
   };
 
-  const bets = [
-    {
-      title: "Workout Every Day",
-      status: "Completed",
-      opponent: "Lior",
-      opponentPhoto: "/lior-avatar.png",
-      yourProgress: 100,
-      opponentProgress: 80,
-      date: "Mar 20",
-    },
-    {
-      title: "No Junk Food",
-      status: "Failed",
-      opponent: "Ben",
-      opponentPhoto: "/ben-avatar.png",
-      yourProgress: 30,
-      opponentProgress: 100,
-      date: "Mar 15",
-    },
-    {
-      title: "Read After Lunch",
-      status: "In Progress",
-      opponent: "Dan",
-      opponentPhoto: "/dan-avatar.png",
-      yourProgress: 60,
-      opponentProgress: 50,
-      date: "Mar 26",
-    },
-  ];
+  <h3 style={styles.sectionTitle}>🎯 Your Bets</h3>
+
+{bets.length === 0 ? (
+  <p style={{ color: "#888" }}>No bets yet. Create your first challenge!</p>
+) : (
+  bets.map((bet, index) => (
+    <div key={index} style={styles.betCard}>
+      <div style={styles.betRow}>
+        <img src={bet.opponentPhoto || "/default-avatar.png"} alt={bet.opponent} style={styles.opponentAvatar} />
+        <div style={{ flex: 1, marginLeft: "10px" }}>
+          <p style={styles.betTitle}>{bet.title}</p>
+          <p style={styles.betMeta}>vs. {bet.opponent} · {bet.date}</p>
+
+          <p style={styles.progressLabel}>Your Progress</p>
+          <div style={styles.progressBarWrapper}>
+            <div style={{ ...styles.progressBar, width: `${bet.yourProgress}%`, backgroundColor: "#3b82f6" }} />
+          </div>
+
+          <p style={styles.progressLabel}>Opponent</p>
+          <div style={styles.progressBarWrapper}>
+            <div style={{ ...styles.progressBar, width: `${bet.opponentProgress}%`, backgroundColor: "#facc15" }} />
+          </div>
+        </div>
+        <span style={{ ...styles.statusBadge, ...getStatusStyle(bet.status) }}>{bet.status}</span>
+      </div>
+    </div>
+  ))
+)}
+
 
   const grit = 87; // לדוגמה
 

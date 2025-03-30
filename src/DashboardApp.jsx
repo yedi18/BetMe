@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import Dashboard from "./Dashboard";
 import BetDetails from "./BetDetails";
 import UpdateBet from "./UpdateBet";
+import ProfilePage from "./ProfilePage";
+import SettingsPage from "./SettingsPage";
+import NewBet from "./NewBet";
 
 const PageTemplate = ({ title, icon }) => (
   <div style={styles.pageWrapper}>
@@ -9,33 +12,54 @@ const PageTemplate = ({ title, icon }) => (
   </div>
 );
 
-export default function DashboardApp({ user, onLogout, onCreateBet }) {
-  const [page, setPage] = useState("home");
 
-  // דוגמת מידע שנשלחת ל־BetDetails ו־UpdateBet
-  const exampleBet = {
-    title: "Eat Less Sugar",
-    yourProgress: 50,
-    opponentProgress: 70,
-    updateNumber: 14,
-    updates: [
-      { name: "Yedidya", points: 4, text: "Lorem Ipsum..." },
-      { name: "Ori", points: 2.5, text: "Did well this week" },
-    ],
-  };
+export default function DashboardApp({ user, onLogout }) {
+  const [page, setPage] = useState("home");
+  const [bets, setBets] = useState([]);
+  const [selectedBet, setSelectedBet] = useState(null);
+
 
   const renderPage = () => {
     switch (page) {
       case "home":
-        return <Dashboard user={user} onLogout={onLogout} onCreateBet={onCreateBet} />;
+        return (
+          <Dashboard
+            user={user}
+            onLogout={onLogout}
+            onCreateBet={() => setPage("newbet")}
+            bets={bets}
+          />
+        );
       case "bets":
-        return <BetDetails bet={exampleBet} />;
+        return <BetDetails bet={bets[0] || {}} />;
       case "stats":
-        return <UpdateBet bet={exampleBet} />;
+        return <UpdateBet bet={bets[0] || {}} />;
       case "profile":
-        return <PageTemplate title="Profile" icon="👤" />;
+        return <ProfilePage user={user} onLogout={onLogout} />;
       case "settings":
-        return <PageTemplate title="Settings" icon="⚙️" />;
+        return <SettingsPage />;
+      case "newbet":
+        return (
+          <NewBet
+            onBack={() => setPage("home")}
+            onFinish={(data) => {
+              const newBet = {
+                title: data.title,
+                status: "In Progress",
+                opponent: data.participants || "Unknown",
+                opponentPhoto: "/default-avatar.png",
+                yourProgress: 0,
+                opponentProgress: 0,
+                date: data.t_date || "TBD"
+              };
+              setBets((prev) => [...prev, newBet]);
+              setPage("home");
+            }}
+          />
+        );
+      case "bets":
+        return <BetDetails bet={selectedBet} />;
+
       default:
         return <Dashboard />;
     }
@@ -48,8 +72,8 @@ export default function DashboardApp({ user, onLogout, onCreateBet }) {
       <nav style={styles.toolbar}>
         {[
           { icon: "🏠", label: "home" },
-          { icon: "📋", label: "bets" }, // עמוד פירוט התערבות
-          { icon: "📊", label: "stats" }, // עמוד עדכון התקדמות
+          { icon: "📋", label: "bets" },
+          { icon: "📊", label: "stats" },
           { icon: "👤", label: "profile" },
           { icon: "⚙️", label: "settings" },
         ].map((item) => (
@@ -82,7 +106,7 @@ const styles = {
     borderRight: "1px solid #e5e7eb",
   },
   contentContainer: {
-    paddingBottom: "70px", // Space for toolbar
+    paddingBottom: "70px",
     flex: 1,
   },
   toolbar: {
