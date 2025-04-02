@@ -1,6 +1,6 @@
 import React from "react";
 
-const MainDashboardView = ({ user, bets, onCreateBet, onEditBet, onBetClick, onLogout, menuOpen, setMenuOpen }) => {
+const MainDashboardView = ({ user, bets, onCreateBet, onEditBet, onBetClick, onLogout, menuOpen, setMenuOpen,onDeleteBet }) => {
   const grit = 87;
 
   return (
@@ -48,17 +48,21 @@ const MainDashboardView = ({ user, bets, onCreateBet, onEditBet, onBetClick, onL
           ) : (
             bets.map((bet, index) => (
               <div
-                key={index}
-                style={{
-                  ...styles.betCard,
-                  ...(bet.isNew ? styles.newHighlight : {}),
-                }}
+                  key={index}
+                  style={{
+                    ...styles.betCard,
+                    ...(bet.isNew ? styles.newHighlight : styles.oldHighlight),
+                  }}
               >
                 <div style={styles.cardHeader}>
                   <p style={styles.betTitle}>{bet.title}</p>
-                  <div>
+                  <div style={styles.headerRight}>
+                    <span style={{ ...styles.statusBadge, ...getStatusStyle(bet.status) }}>
+                      {bet.status}
+                    </span>
                     <button style={styles.cardButton} onClick={() => onEditBet(bet)}>✏️</button>
                     <button style={styles.cardButton} onClick={() => onBetClick(bet)}>🔍</button>
+                    <button style={styles.cardButton} onClick={() => onDeleteBet(bet)} title="Delete">❌</button>
                   </div>
                 </div>
                 <p style={styles.betMeta}>vs. {bet.opponent} · {bet.date}</p>
@@ -234,23 +238,34 @@ const styles = {
     position: "relative",
     transition: "box-shadow 0.3s ease",
   },
-  newHighlight: {
-    boxShadow: "0 0 12px 4px rgba(34,197,94,0.6)",
-    border: "2px solid #4ade80",
-  },
   cardHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "6px",
   },
+  headerRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px", // ריווח בין סטטוס לאייקונים
+  },
+  statusBadge: {
+    padding: "4px 10px",
+    borderRadius: "999px",
+    fontSize: "12px",
+    fontWeight: "bold",
+    whiteSpace: "nowrap",
+    backgroundColor: "#fef08a",
+    color: "#92400e",
+  },  
   cardButton: {
     background: "none",
     border: "none",
     cursor: "pointer",
     fontSize: "16px",
-    marginLeft: "6px",
-  },
+    marginLeft: "6px",  // ✅ ריווח בין כפתורים
+    zIndex: 2,          // ✅ יוודא שהם מעל התגית
+  },  
   betTitle: {
     fontSize: "16px",
     fontWeight: "600",
@@ -279,16 +294,15 @@ const styles = {
   progressBar: {
     height: "100%",
   },
-  statusBadge: {
-    position: "absolute",
-    top: "16px",
-    right: "16px",
-    padding: "4px 10px",
-    borderRadius: "999px",
-    fontSize: "12px",
-    fontWeight: "bold",
-    whiteSpace: "nowrap",
+  newHighlight: {
+    boxShadow: "0 0 12px 4px rgba(34,197,94,0.6)",   // ירוק זוהר
+    border: "2px solid #4ade80",
   },
+  oldHighlight: {
+    boxShadow: "0 0 12px 4px rgba(251, 191, 36, 0.4)", // כתום
+    border: "2px solid #facc15",
+  },
+ 
 };
 
 export default MainDashboardView;

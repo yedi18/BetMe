@@ -7,6 +7,10 @@ import UpdateBet from "../bets/UpdateBet";
 import ProfilePage from "../pages/ProfilePage";
 import SettingsPage from "../pages/SettingsPage";
 import MainDashboardView from "./MainDashboardView";
+import { collection, query, where, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { db } from "./firebase";
+
+
 
 export default function Dashboard({ user, onLogout }) {
   const [page, setPage] = useState("home");
@@ -35,14 +39,64 @@ export default function Dashboard({ user, onLogout }) {
     setPage("home");
     setShowSuccess(true);
   };
-
+  const handleDeleteBet = async (bet) => {
+    const confirm = window.confirm("Are you sure you want to delete this bet?");
+    if (!confirm) return;
+  
+    try {
+      console.log("Trying to delete:", bet);
+      await deleteDoc(doc(db, "bets", bet.id));
+      setBets((prev) => prev.filter((b) => b.id !== bet.id));
+    } catch (err) {
+      console.error("Failed to delete bet:", err);
+    }
+  };
   useEffect(() => {
     if (showSuccess) {
-      const timer = setTimeout(() => setShowSuccess(false), 3000);
+      const timer = setTimeout(() => setShowSuccess(false), 5000);
       return () => clearTimeout(timer);
     }
   }, [showSuccess]);
-
+  useEffect(() => {
+    if (user) fetchBets();
+  }, [user]);
+  const fetchBets = async () => {
+    try {
+      const q = query(
+        collection(db, "bets"),
+        where("createdBy", "==", user.email)
+      );
+      const querySnapshot = await getDocs(q);
+      const betsData = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title || "Untitled Bet",
+          status: "In Progress",
+          opponent: data.participants?.[0] || "Unknown",
+          opponentPhoto: "/default-avatar.png",
+          yourProgress: 0,
+          opponentProgress: 0,
+          date: data.deadline || "TBD",
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+        };
+      });
+  
+      // מיין לפי תאריך מהחדש לישן
+      betsData.sort((a, b) => b.createdAt - a.createdAt);
+  
+      // סמן את הראשון כ־isNew
+      const finalBets = betsData.map((bet, index) => ({
+        ...bet,
+        isNew: index === 0,
+      }));
+  
+      setBets(finalBets);
+    } catch (error) {
+      console.error("Failed to fetch bets:", error);
+    }
+  };  
+   
   const renderPage = () => {
     switch (page) {
       case "home":
@@ -62,6 +116,7 @@ export default function Dashboard({ user, onLogout }) {
             onLogout={handleLogout}
             menuOpen={menuOpen}
             setMenuOpen={setMenuOpen}
+            onDeleteBet={handleDeleteBet}
           />
         );
       case "newbet":
@@ -91,7 +146,7 @@ export default function Dashboard({ user, onLogout }) {
 
   return (
     <div style={styles.wrapper}>
-      {showSuccess && <div style={styles.successToast}>🎉 New Bet Created Successfully!</div>}
+      {showSuccess &&<div style={{...styles.successToast,...(showSuccess ? {} : styles.successToastHidden),}}>🎉 New Bet Created Successfully!</div>}
       <div style={styles.content}>{renderPage()}</div>
     </div>
   );
@@ -131,6 +186,10 @@ const styles = {
     fontWeight: "bold",
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
     zIndex: 1000,
-    animation: "fadeIn 0.3s ease-in-out",
+    transition: "opacity 0.8s ease-in-out",
+    opacity: 1,
+  },
+  successToastHidden: {
+    opacity: 0,
   },
 };
