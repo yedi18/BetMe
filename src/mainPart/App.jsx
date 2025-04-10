@@ -3,8 +3,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../mainPart/firebase";
 
-import Login from "./Login";
-import Dashboard from "../mainPart/Dashboard";
+import Login from "../MVP-pages/LoginPage.jsx";
+import Dashboard from "../MVP-pages/DashboardPage.jsx";
 
 function App() {
   const [user, setUser] = useState(null);

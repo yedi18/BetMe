@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { collection, query, where, getDocs, updateDoc, arrayUnion, addDoc } from "firebase/firestore";
 import { db } from "../mainPart/firebase";
-import SmartStep from "./SmartStep";
 import { getAuth } from "firebase/auth";
 const progressPercents = {
   1: 25,

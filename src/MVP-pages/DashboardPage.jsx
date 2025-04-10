@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
-import { auth } from "./firebase";
-import NewBet from "../bets/NewBet";
-import BetDetails from "../bets/BetDetails";
-import UpdateBet from "../bets/UpdateBet";
-import ProfilePage from "../pages/ProfilePage";
-import SettingsPage from "../pages/SettingsPage";
-import MainDashboardView from "./MainDashboardView";
+import { auth } from "../mainPart/firebase";
+import NewBet from "../MVP-pages/NewBetPage";
+import BetDetails from "../MVP-pages/BetDetailsPage";
+import UpdateBet from "../MVP-pages/UpdatePage";
+import MainDashboardView from "../MVP-pages/MainDashboardView";
 import { collection, query, where, getDocs, doc, deleteDoc } from "firebase/firestore";
-import { db } from "./firebase";
+import { db } from "../mainPart/firebase";
 
 
 
@@ -135,8 +133,6 @@ export default function Dashboard({ user, onLogout }) {
             <UpdateBet bet={selectedBet} />
           </>
         );
-      case "profile":
-        return <ProfilePage user={user} onLogout={handleLogout} />;
       case "settings":
         return <SettingsPage />;
       default:

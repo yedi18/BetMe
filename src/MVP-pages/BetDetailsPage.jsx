@@ -1,7 +1,7 @@
 import React from "react";
 
-import ProgressBar  from "./progressBar";
-import UpdateCardf  from "./UpdateCard";
+import ProgressBar  from "../widgets/progressBar";
+import UpdateCardf  from "../widgets/UpdateCard";
 
 function BetDetails({ bet, onBack, onEdit }) {
   if (!bet) return null;

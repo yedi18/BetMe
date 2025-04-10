@@ -1,6 +1,7 @@
 import React from "react";
+import ProgressBar from "../widgets/progressBar";
 
-const MainDashboardView = ({ user, bets, onCreateBet, onEditBet, onBetClick, onLogout, menuOpen, setMenuOpen,onDeleteBet }) => {
+const MainDashboardView = ({ user, bets, onCreateBet, onEditBet, onBetClick, onLogout, menuOpen, setMenuOpen, onDeleteBet }) => {
   const grit = 87;
 
   return (
@@ -17,66 +18,55 @@ const MainDashboardView = ({ user, bets, onCreateBet, onEditBet, onBetClick, onL
           </div>
         </div>
 
+        <div style={{ position: "relative", display: "inline-block", marginBottom: 12 }}>
+          <img
+            src={user?.photoURL || "/default-avatar.png"}
+            alt="User"
+            style={styles.avatar}
+          />
+
+          <div style={styles.gritBadge}><span style={{ fontSize: 32 }}>{grit}</span><span style={{ fontSize: 15 }}>grit</span></div>
+        </div>
+
+        <h1 style={styles.title}>Updates</h1>
+
         <div style={styles.circlesRow}>
           {["#f87171", "#f472b6", "#4ade80", "#facc15", "#38bdf8"].map((color, idx) => (
-            <div key={idx} style={{ ...styles.circle, backgroundColor: color }} />
+            <div key={idx} style={{ ...styles.circle, backgroundColor: color, marginLeft: -20, // Negative margin to overlap
+            }} />
           ))}
         </div>
 
-        <h1 style={styles.title}>Welcome to <span style={styles.brand}>BetMe 🎉</span></h1>
-        <p style={styles.motivation}>Your goal is in your hands 💪</p>
-        <p style={styles.dailyTip}>💡 Tip of the day: Invite a friend and make a fun bet!</p>
-
-        <div style={{ position: "relative", display: "inline-block", marginBottom: 12 }}>
-        <img
-            src={user?.photoURL || "/default-avatar.png"} 
-            alt="User"
-            style={styles.avatar}
-        />
-
-          <div style={styles.gritBadge}>{grit}<br /><span style={{ fontSize: 10 }}>grit</span></div>
-        </div>
-
-        <h2 style={styles.name}>Hello, {user?.displayName || "Guest"} 👋</h2>
-
         <button style={styles.newBetButton} onClick={onCreateBet}>➕ Create New Bet</button>
 
-        <h3 style={styles.sectionTitle}>🎯 Your Bets</h3>
         <div style={styles.betsGrid}>
           {bets.length === 0 ? (
             <p style={{ color: "#888" }}>No bets yet. Create your first challenge!</p>
           ) : (
             bets.map((bet, index) => (
               <div
-                  key={index}
-                  style={{
-                    ...styles.betCard,
-                    ...(bet.isNew ? styles.newHighlight : styles.oldHighlight),
-                  }}
+                key={index}
+                style={{
+                  ...styles.betCard,
+                  ...(bet.isNew ? styles.newHighlight : styles.oldHighlight),
+                }}
               >
                 <div style={styles.cardHeader}>
                   <p style={styles.betTitle}>{bet.title}</p>
                   <div style={styles.headerRight}>
-                    <span style={{ ...styles.statusBadge, ...getStatusStyle(bet.status) }}>
-                      {bet.status}
-                    </span>
-                    <button style={styles.cardButton} onClick={() => onEditBet(bet)}>✏️</button>
                     <button style={styles.cardButton} onClick={() => onBetClick(bet)}>🔍</button>
                     <button style={styles.cardButton} onClick={() => onDeleteBet(bet)} title="Delete">❌</button>
                   </div>
                 </div>
                 <p style={styles.betMeta}>vs. {bet.opponent} · {bet.date}</p>
                 <div style={styles.progressSection}>
-                  <p style={styles.progressLabel}>Your Progress</p>
                   <div style={styles.progressBarWrapper}>
-                    <div style={{ ...styles.progressBar, width: `${bet.yourProgress}%`, backgroundColor: "#3b82f6" }} />
-                  </div>
-                  <p style={styles.progressLabel}>Opponent</p>
-                  <div style={styles.progressBarWrapper}>
-                    <div style={{ ...styles.progressBar, width: `${bet.opponentProgress}%`, backgroundColor: "#facc15" }} />
+                    <div style={styles.progressBarContainer}>
+                      <ProgressBar color="#00e6e6" progress={70} />
+                      <ProgressBar color="#facc15" progress={50} />
+                    </div>
                   </div>
                 </div>
-                <span style={{ ...styles.statusBadge, ...getStatusStyle(bet.status) }}>{bet.status}</span>
               </div>
             ))
           )}
@@ -102,21 +92,20 @@ const getStatusStyle = (status) => {
 const styles = {
   container: {
     minHeight: "100vh",
-    background: "linear-gradient(to bottom right, #e0f2fe, #ffffff)",
+    background: " #e0f2fe",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     padding: "20px",
   },
   card: {
-    backgroundColor: "#fff",
     padding: "30px",
     borderRadius: "20px",
-    boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
     textAlign: "center",
-    width: "100%",
-    maxWidth: "600px",
+    width: "70%",
+    maxWidth: "500px",
     position: "relative",
+    gap: "20px",
   },
   topBar: {
     display: "flex",
@@ -124,10 +113,12 @@ const styles = {
     marginBottom: "8px",
   },
   menuButton: {
-    background: "none",
+    background: "rgba(0,0,0,0.1)",
     border: "none",
+    borderRadius: "100px",
     fontSize: "24px",
     cursor: "pointer",
+    color: "black",
   },
   dropdown: {
     position: "absolute",
@@ -151,69 +142,48 @@ const styles = {
   circlesRow: {
     display: "flex",
     justifyContent: "center",
-    gap: "10px",
     marginBottom: "16px",
   },
   circle: {
-    width: "20px",
-    height: "20px",
+    width: "60px",
+    height: "60px",
     borderRadius: "50%",
   },
   title: {
     fontSize: "22px",
     color: "#1e3a8a",
     marginBottom: "4px",
-  },
-  brand: {
-    color: "#2563eb",
-    fontWeight: "bold",
-  },
-  motivation: {
-    fontSize: "16px",
-    color: "#1e40af",
-    marginBottom: "6px",
-  },
-  dailyTip: {
-    fontSize: "14px",
-    color: "#0f172a",
-    fontStyle: "italic",
-    marginBottom: "16px",
+    textAlign: "left",
   },
   avatar: {
-    width: "90px",
-    height: "90px",
+    width: "150px",
+    height: "150px",
     borderRadius: "50%",
     objectFit: "cover",
   },
   gritBadge: {
     position: "absolute",
-    top: "0",
-    right: "-10px",
+    bottom: "-30px",
+    right: "-30px",
     backgroundColor: "#4ade80",
-    color: "#065f46",
+    color: "#000",
     borderRadius: "50%",
     padding: "6px",
-    fontSize: "14px",
     fontWeight: "bold",
-    width: "40px",
-    height: "40px",
+    width: "70px",
+    height: "70px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },
-  name: {
-    margin: "10px 0",
-    fontSize: "20px",
-    color: "#1e40af",
-  },
   newBetButton: {
     padding: "12px 24px",
     backgroundColor: "#2563eb",
-    color: "#fff",
+    color: "#000",
     border: "none",
     borderRadius: "12px",
-    fontSize: "16px",
+    fontSize: "30px",
     marginBottom: "20px",
     cursor: "pointer",
   },
@@ -231,8 +201,9 @@ const styles = {
     textAlign: "left",
   },
   betCard: {
-    backgroundColor: "#f8fafc",
-    borderRadius: "12px",
+    width: "100%",
+    backgroundColor: "#B0B0B0",
+    borderRadius: "24px",
     padding: "16px",
     boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
     position: "relative",
@@ -257,7 +228,7 @@ const styles = {
     whiteSpace: "nowrap",
     backgroundColor: "#fef08a",
     color: "#92400e",
-  },  
+  },
   cardButton: {
     background: "none",
     border: "none",
@@ -265,15 +236,16 @@ const styles = {
     fontSize: "16px",
     marginLeft: "6px",  // ✅ ריווח בין כפתורים
     zIndex: 2,          // ✅ יוודא שהם מעל התגית
-  },  
+  },
   betTitle: {
+    color: "#000",
     fontSize: "16px",
     fontWeight: "600",
     marginBottom: "4px",
   },
   betMeta: {
     fontSize: "14px",
-    color: "#64748b",
+    color: "#000",
     marginBottom: "6px",
   },
   progressSection: {
@@ -284,12 +256,13 @@ const styles = {
     marginTop: "4px",
     color: "#475569",
   },
-  progressBarWrapper: {
-    height: "6px",
-    backgroundColor: "#e2e8f0",
-    borderRadius: "4px",
-    overflow: "hidden",
-    marginBottom: "6px",
+  progressBarContainer : {
+    display: "flex",
+    flexDirection: "column", // Stack progress bars vertically
+    alignItems: "center", // Center horizontally
+    justifyContent: "center", // Center vertically
+    gap: "0px", // Adds space between progress bars
+    width: "100%",
   },
   progressBar: {
     height: "100%",
@@ -302,7 +275,7 @@ const styles = {
     boxShadow: "0 0 12px 4px rgba(251, 191, 36, 0.4)", // כתום
     border: "2px solid #facc15",
   },
- 
+
 };
 
 export default MainDashboardView;
