@@ -20,24 +20,27 @@ const MainDashboardView = ({ user, bets, onCreateBet, onEditBet, onBetClick, onL
 
         <div style={{ position: "relative", display: "inline-block", marginBottom: 12 }}>
           <img
-            src={user?.photoURL || "/default-avatar.png"}
+            src={user?.photoURL || "/images/profile-icon.jpg"}
             alt="User"
             style={styles.avatar}
           />
 
-          <div style={styles.gritBadge}><span style={{ fontSize: 32 }}>{grit}</span><span style={{ fontSize: 15 }}>grit</span></div>
+          <div style={styles.gritBadge}>
+            <span style={{ fontSize: 20 }}>{grit}</span>
+            <span style={{ fontSize: 12 }}>grit</span></div>
         </div>
 
         <h1 style={styles.title}>Updates</h1>
 
         <div style={styles.circlesRow}>
           {["#f87171", "#f472b6", "#4ade80", "#facc15", "#38bdf8"].map((color, idx) => (
-            <div key={idx} style={{ ...styles.circle, backgroundColor: color, marginLeft: -20, // Negative margin to overlap
+            <div key={idx} style={{
+              ...styles.circle, backgroundColor: color, marginLeft: -14, // Negative margin to overlap
             }} />
           ))}
         </div>
 
-        <button style={styles.newBetButton} onClick={onCreateBet}>➕ Create New Bet</button>
+        <button style={styles.newBetButton} onClick={onCreateBet}>Create Bet</button>
 
         <div style={styles.betsGrid}>
           {bets.length === 0 ? (
@@ -48,7 +51,6 @@ const MainDashboardView = ({ user, bets, onCreateBet, onEditBet, onBetClick, onL
                 key={index}
                 style={{
                   ...styles.betCard,
-                  ...(bet.isNew ? styles.newHighlight : styles.oldHighlight),
                 }}
               >
                 <div style={styles.cardHeader}>
@@ -62,8 +64,8 @@ const MainDashboardView = ({ user, bets, onCreateBet, onEditBet, onBetClick, onL
                 <div style={styles.progressSection}>
                   <div style={styles.progressBarWrapper}>
                     <div style={styles.progressBarContainer}>
-                      <ProgressBar color="#00e6e6" progress={70} />
-                      <ProgressBar color="#facc15" progress={50} />
+                      <ProgressBar color="#00e6e6" progress={70} height={10} />
+                      <ProgressBar color="#facc15" progress={50} height={10} />
                     </div>
                   </div>
                 </div>
@@ -91,38 +93,41 @@ const getStatusStyle = (status) => {
 
 const styles = {
   container: {
-    minHeight: "100vh",
-    background: " #e0f2fe",
+    height: "100%",
+    width: "100%",
+    margin: "0px",
+    padding: "0px",
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
-    padding: "20px",
+    background: " #e0f2fe",
+    boxShadow: "0 12px 30px rgba(0,0,0,0.1)",
   },
   card: {
-    padding: "30px",
-    borderRadius: "20px",
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "0px 30px",
+    margin: "0px",
     textAlign: "center",
-    width: "70%",
-    maxWidth: "500px",
-    position: "relative",
-    gap: "20px",
   },
   topBar: {
     display: "flex",
     justifyContent: "flex-end",
-    marginBottom: "8px",
+    height: "40px",
+    padding: "5px"
   },
   menuButton: {
-    background: "rgba(0,0,0,0.1)",
-    border: "none",
-    borderRadius: "100px",
-    fontSize: "24px",
+    fontSize: "14px",
+    padding: "4px 10px",
+    borderRadius: "50%",
     cursor: "pointer",
+    border: "none",
     color: "black",
+    background: "rgba(0,0,0,0.1)",
   },
   dropdown: {
     position: "absolute",
-    top: "30px",
+    top: "10px",
     right: "0",
     background: "#fff",
     border: "1px solid #ccc",
@@ -131,83 +136,74 @@ const styles = {
     zIndex: 999,
   },
   dropdownItem: {
-    padding: "10px 20px",
+    padding: "5px 10px",
     fontSize: "14px",
     background: "white",
     border: "none",
     cursor: "pointer",
     width: "100%",
     textAlign: "left",
-  },
-  circlesRow: {
-    display: "flex",
-    justifyContent: "center",
-    marginBottom: "16px",
-  },
-  circle: {
-    width: "60px",
-    height: "60px",
-    borderRadius: "50%",
-  },
-  title: {
-    fontSize: "22px",
-    color: "#1e3a8a",
-    marginBottom: "4px",
-    textAlign: "left",
-  },
+    color: "#000",
+
+  }, 
   avatar: {
-    width: "150px",
-    height: "150px",
+    width: "130px",
+    height: "130px",
     borderRadius: "50%",
     objectFit: "cover",
   },
   gritBadge: {
     position: "absolute",
-    bottom: "-30px",
-    right: "-30px",
+    bottom: "0px",
+    right: "-10px",
     backgroundColor: "#4ade80",
     color: "#000",
     borderRadius: "50%",
-    padding: "6px",
-    fontWeight: "bold",
-    width: "70px",
-    height: "70px",
+    width: "50px",
+    height: "50px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },
+    title: {
+    fontSize: "20px",
+    color: "#1e3a8a",
+    margin: "20px",
+    textAlign: "left",
+  },
+  circlesRow: {
+    display: "flex",
+    justifyContent: "center",
+  },
+  circle: {
+    width: "65px",
+    height: "65px",
+    borderRadius: "50%",
+  },
   newBetButton: {
     padding: "12px 24px",
+    margin: "50px 0px",
     backgroundColor: "#2563eb",
     color: "#000",
     border: "none",
     borderRadius: "12px",
-    fontSize: "30px",
-    marginBottom: "20px",
+    fontSize: "25px",
     cursor: "pointer",
   },
-  sectionTitle: {
-    fontSize: "18px",
-    color: "#111",
-    fontWeight: "bold",
-    marginBottom: "12px",
-    textAlign: "left",
-  },
   betsGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr",
+    display: "flex",
+    flexDirection: "column",
     gap: "12px",
     textAlign: "left",
+    justifyItems: "center",  // Centers grid items horizontally
   },
   betCard: {
-    width: "100%",
-    backgroundColor: "#B0B0B0",
+    width: "80%",
+    backgroundColor: "#D9D9D9",
     borderRadius: "24px",
-    padding: "16px",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+    padding: "0px 28px",
     position: "relative",
-    transition: "box-shadow 0.3s ease",
   },
   cardHeader: {
     display: "flex",
@@ -220,28 +216,22 @@ const styles = {
     alignItems: "center",
     gap: "6px", // ריווח בין סטטוס לאייקונים
   },
-  statusBadge: {
-    padding: "4px 10px",
-    borderRadius: "999px",
-    fontSize: "12px",
-    fontWeight: "bold",
-    whiteSpace: "nowrap",
-    backgroundColor: "#fef08a",
-    color: "#92400e",
-  },
   cardButton: {
+    width: "10px",
     background: "none",
     border: "none",
     cursor: "pointer",
     fontSize: "16px",
     marginLeft: "6px",  // ✅ ריווח בין כפתורים
-    zIndex: 2,          // ✅ יוודא שהם מעל התגית
   },
   betTitle: {
     color: "#000",
-    fontSize: "16px",
+    fontSize: "22px",
     fontWeight: "600",
-    marginBottom: "4px",
+    marginBottom: "0px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
   betMeta: {
     fontSize: "14px",
@@ -256,7 +246,7 @@ const styles = {
     marginTop: "4px",
     color: "#475569",
   },
-  progressBarContainer : {
+  progressBarContainer: {
     display: "flex",
     flexDirection: "column", // Stack progress bars vertically
     alignItems: "center", // Center horizontally

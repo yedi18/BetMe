@@ -41,7 +41,7 @@ function App() {
           width: "100vw",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           direction: "rtl",
           background: "#e0f2ff",
         }}

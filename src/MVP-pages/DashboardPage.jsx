@@ -151,16 +151,21 @@ export default function Dashboard({ user, onLogout }) {
 const styles = {
   wrapper: {
     minHeight: "100vh",
+    maxWidth: "330px",
+    margin: "0 auto",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     backgroundColor: "#f9fafb",
     position: "relative",
   },
   content: {
+    justifyContent: "flex-start",
+    margin: "0px",
     width: "100%",
-    maxWidth: "600px",
+    maxWidth: "330px",
+    height: "100vh",  
   },
   backButton: {
     alignSelf: "flex-start",

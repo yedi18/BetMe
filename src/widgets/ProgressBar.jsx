@@ -1,10 +1,10 @@
 import React from "react";
 
-function ProgressBar({ color, progress}) {
+function ProgressBar({ color, progress,height}) {
     return (
 
         <div style={progressStyles.bar}>
-          <div style={{ ...progressStyles.fill, width: `${progress}%`, backgroundColor: color }}></div>
+          <div style={{ ...progressStyles.fill, width: `${progress}%`, backgroundColor: color, height: `${height}px` }}></div>
         </div>
     );
   }
@@ -12,7 +12,6 @@ function ProgressBar({ color, progress}) {
   const progressStyles = {
     bar: {
       width: "100%", // Defines the total width of the progress bar
-      height: "24px", // Defines the thickness of the bar
       backgroundColor: "#ccc", // Gray background
       borderRadius: "24px",
       overflow: "hidden", // Prevents overflow of inner fill
