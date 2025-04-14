@@ -130,6 +130,7 @@ function Login({ onLogin }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        margin: "0px auto",
         padding: "40px",
         backgroundColor: "#fff",
         borderRadius: "20px",
