@@ -123,14 +123,14 @@ export default function Dashboard({ user, onLogout }) {
         return (
           <>
             <button onClick={() => setPage("home")} style={styles.backButton}>⬅ Back</button>
-            <BetDetails bet={selectedBet} />
+            <BetDetails bet={selectedBet} setPage={setPage}/>
           </>
         );
       case "stats":
         return (
           <>
             <button onClick={() => setPage("home")} style={styles.backButton}>⬅ Back</button>
-            <UpdateBet bet={selectedBet} />
+            <UpdateBet bet={selectedBet}/>
           </>
         );
       case "settings":

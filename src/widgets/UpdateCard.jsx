@@ -20,14 +20,13 @@ function UpdateCard({ username, points, rank, description }) {
 
 const cardStyles = {
     container: {
-        backgroundColor: "#EDEDED",
+        backgroundColor: "#D9D9D9",
         padding: "15px",
         borderRadius: "12px",
         width: "100%",
         maxWidth: "250px",
         margin: "15px auto",
         fontFamily: "'Arial', sans-serif",
-        boxShadow: "2px 2px 10px rgba(0,0,0,0.1)",
     },
     header: {
         display: "flex",
@@ -64,10 +63,11 @@ const cardStyles = {
         color: "#666",
     },
     description: {
+        margin: "0 auto",
         textAlign: "left", // Aligns text to the left
-        width: "100%", // Ensures text takes full width
+        width: "90%", // Ensures text takes full width
         fontSize: "14px",
-        color: "#666",
+        color: "#000",
     },
 };
 

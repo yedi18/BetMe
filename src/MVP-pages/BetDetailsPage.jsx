@@ -1,25 +1,48 @@
 import React from "react";
+import ProgressBar from "../widgets/progressBar";
+import UpdateCardf from "../widgets/UpdateCard";
 
-import ProgressBar  from "../widgets/progressBar";
-import UpdateCardf  from "../widgets/UpdateCard";
-
-function BetDetails({ bet, onBack, onEdit }) {
+function BetDetails({ bet, onBack, onEdit, setPage }) {
   if (!bet) return null;
+
+  const goToUpdatePage = () => {
+    setPage("stats");
+  };
 
   return (
     <div style={detailStyles.container}>
-
       <h2 style={detailStyles.title}>{bet.title}</h2>
-      
 
-      <div style={detailStyles.progressBarContainer}>
-        <ProgressBar color="#00e6e6" progress={70} />
-
-        <ProgressBar color="#facc15" progress={50} />
+      <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "10px" }}>
+        <div style={{
+          width: "50px",
+          height: "50px",
+          background: "#00e6e6",
+          borderRadius: "50%",
+          flexShrink: 0,
+          display: "inline-block",
+          boxSizing: "border-box"
+        }}></div>
+        <ProgressBar color="#00e6e6" progress={70} height={20} />
       </div>
 
-      <button style={detailStyles.title}>
-      New Update
+      <div style={{ height: "5px" }}></div>
+
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", gap: "10px" }}>
+        <div style={{
+          width: "50px",
+          height: "50px",
+          background: "#facc15",
+          borderRadius: "50%",
+          flexShrink: 0,
+          display: "inline-block",
+          boxSizing: "border-box"
+        }}></div>
+        <ProgressBar color="#facc15" progress={50} height={20} />
+      </div>
+
+      <button style={detailStyles.title} onClick={goToUpdatePage}>
+        New Update
       </button>
 
       <UpdateCardf username="Yedidya" points={4} rank={14} description="Lorem Ipsum has been the industry's standard dummy text ever since the 1500s..." />
@@ -34,13 +57,10 @@ function BetDetails({ bet, onBack, onEdit }) {
 
 const detailStyles = {
   container: {
-    color: "#000", // Default text color (black)
+    color: "#000",
     padding: "30px",
     backgroundColor: "#DCF5FF",
-    borderRadius: "20px",
     boxShadow: "0 0 20px rgba(0,0,0,0.1)",
-    maxWidth: "500px",
-    margin: "5",
     textAlign: "center",
   },
   title: {
@@ -55,25 +75,8 @@ const detailStyles = {
     fontFamily: "'Comic Sans MS', cursive, sans-serif",
     margin: "20px auto",
   },
-  progressBarContainer : {
-    display: "flex",
-    flexDirection: "column", // Stack progress bars vertically
-    alignItems: "center", // Center horizontally
-    justifyContent: "center", // Center vertically
-    gap: "0px", // Adds space between progress bars
-    width: "100%",
-  },
-  section: {
-    margin: "20px 0",
-  },
-  progressWrapper: {
-    height: "8px",
-    backgroundColor: "#e5e7eb",
-    borderRadius: "4px",
-    overflow: "hidden",
-  },
-  progressBar: {
-    height: "100%",
+  progressBarContainer: {
+    boxSizing: "border-box",
   },
   editButton: {
     padding: "10px 20px",

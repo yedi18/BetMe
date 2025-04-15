@@ -192,7 +192,6 @@ const NewBet = ({ onBack, onFinish }) => {
         {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <h2 style={styles.title}>📝 Name your challenge</h2>
-              <p style={styles.subtitle}>Give your bet a meaningful title</p>
               <div style={styles.heroRow}>
               <img
                 src="/images/mo_ch.png"
@@ -345,11 +344,10 @@ const NewBet = ({ onBack, onFinish }) => {
 
 const styles = {
   container: {
-    padding: "32px",
-    minHeight: "100vh",
+    padding: "0px",
+    height: "100vh",
     maxWidth: "500px",
     margin: "0 auto",
-    borderRadius: "16px",
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
     display: "flex",
     flexDirection: "column",
@@ -380,7 +378,7 @@ const styles = {
     color: "#fff",
     padding: "10px 20px",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "24px",
     cursor: "pointer",
   },
   backButton: {
@@ -388,13 +386,13 @@ const styles = {
     color: "#111827",
     padding: "10px 20px",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "24px",
     cursor: "pointer",
   },
   navRow: {
     display: "flex",
     justifyContent: "space-between",
-    marginTop: "10px",
+    margin: "10px 20px",
   },
   suggestionItem: {
     backgroundColor: "#f0f9ff",
@@ -482,11 +480,11 @@ const styles = {
   },
   
   largeAvatar: {
-    width: "600px",  // תוכל גם 200 אם אתה רוצה הכי גדול
+    width: "380px",  // תוכל גם 200 אם אתה רוצה הכי גדול
     height: "auto",
+    margin: "20px",
     objectFit: "contain",
     pointerEvents: "none"
-
   },
   
   speechBubble: {
@@ -498,14 +496,13 @@ const styles = {
     maxWidth: "220px",
   }, 
   bigInput: {
-    width: "100%",              // שומר על גודל יחסי למיכל
+    width: "85%",              // שומר על גודל יחסי למיכל
     maxWidth: "400px",          // מונע גלישה על מסכים קטנים
     margin: "0 auto 30px",      // מרכז את השדה אופקית
     display: "block",           // מאפשר margin אוטומטי לעבוד
-    padding: "16px",
+    padding: "16px 5px",
     fontSize: "18px",
-    borderRadius: "10px",
-    border: "2px solid #d1d5db",
+    borderRadius: "24px",
     outline: "none",
   },  
 };
