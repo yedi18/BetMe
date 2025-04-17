@@ -27,8 +27,8 @@ const MainDashboardView = ({ user, bets, onCreateBet, onEditBet, onBetClick, onL
           />
 
           <div style={styles.gritBadge}>
-            <span style={{ fontSize: 20 }}>{grit}</span>
-            <span style={{ fontSize: 12 }}>grit</span></div>
+            <span style={{ fontSize: 20, lineHeight: 1}}>{grit}</span>
+            <span style={{ fontSize: 12, lineHeight: 1 }}>grit</span></div>
         </div>
 
         <h1 style={styles.title}>Updates</h1>
