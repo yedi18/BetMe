@@ -1,3 +1,4 @@
+import '../index.css';
 import React from "react";
 import ProgressBar from "../widgets/progressBar";
 
@@ -168,8 +169,7 @@ const styles = {
   },
     title: {
     fontSize: "20px",
-    color: "#1e3a8a",
-    margin: "20px",
+    color: "#000",
     textAlign: "left",
   },
   circlesRow: {
@@ -184,10 +184,10 @@ const styles = {
   newBetButton: {
     padding: "12px 24px",
     margin: "50px 0px",
-    backgroundColor: "#2563eb",
-    color: "#000",
+    backgroundColor: "#3B82F6",
+    color: "#fff",
     border: "none",
-    borderRadius: "12px",
+    borderRadius: "20px",
     fontSize: "25px",
     cursor: "pointer",
   },

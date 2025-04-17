@@ -13,7 +13,7 @@ function BetDetails({ bet, onBack, onEdit, setPage }) {
     <div style={detailStyles.container}>
       <h2 style={detailStyles.title}>{bet.title}</h2>
 
-      <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "10px" }}>
+      <div style={{ display: "flex", alignItems: "centerז", width: "100%", gap: "10px" }}>
         <div style={{
           width: "50px",
           height: "50px",
