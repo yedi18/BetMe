@@ -22,7 +22,7 @@ const cardStyles = {
     container: {
         backgroundColor: "#D9D9D9",
         padding: "15px",
-        borderRadius: "12px",
+        borderRadius: "25px",
         width: "100%",
         maxWidth: "250px",
         margin: "15px auto",

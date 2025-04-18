@@ -1,3 +1,4 @@
+import '../index.css';
 import React from "react";
 import ProgressBar from "../widgets/progressBar";
 import UpdateCardf from "../widgets/UpdateCard";
@@ -13,10 +14,10 @@ function BetDetails({ bet, onBack, onEdit, setPage }) {
     <div style={detailStyles.container}>
       <h2 style={detailStyles.title}>{bet.title}</h2>
 
-      <div style={{ display: "flex", alignItems: "centerז", width: "100%", gap: "10px" }}>
+      <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "10px" }}>
         <div style={{
-          width: "50px",
-          height: "50px",
+          width: "60px",
+          height: "60px",
           background: "#00e6e6",
           borderRadius: "50%",
           flexShrink: 0,
@@ -30,8 +31,8 @@ function BetDetails({ bet, onBack, onEdit, setPage }) {
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", gap: "10px" }}>
         <div style={{
-          width: "50px",
-          height: "50px",
+          width: "60px",
+          height: "60px",
           background: "#facc15",
           borderRadius: "50%",
           flexShrink: 0,
@@ -41,7 +42,7 @@ function BetDetails({ bet, onBack, onEdit, setPage }) {
         <ProgressBar color="#facc15" progress={50} height={20} />
       </div>
 
-      <button style={detailStyles.title} onClick={goToUpdatePage}>
+      <button style={detailStyles.updateButton} onClick={goToUpdatePage}>
         New Update
       </button>
 
@@ -64,16 +65,26 @@ const detailStyles = {
     textAlign: "center",
   },
   title: {
-    backgroundColor: "#3575f6",
+    backgroundColor: "#3B82F6",
     color: "white",
     fontSize: "22px",
+    fontWeight: "600",
     textAlign: "center",
-    padding: "15px",
-    borderRadius: "15px",
-    width: "80%",
-    maxWidth: "250px",
-    fontFamily: "'Comic Sans MS', cursive, sans-serif",
-    margin: "20px auto",
+    padding: "10px 0px",
+    marginBottom: "50px",
+    borderRadius: "20px",
+    width: "100%",
+  },
+  updateButton: {
+    backgroundColor: "#3B82F6",
+    color: "white",
+    fontSize: "25px",
+    fontWeight: "600",
+    textAlign: "center",
+    padding: "10px 24px",
+    borderRadius: "20px",
+    //width: "100%",
+    margin: "50px auto",
   },
   progressBarContainer: {
     boxSizing: "border-box",

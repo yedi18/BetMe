@@ -171,6 +171,7 @@ const styles = {
     fontSize: "20px",
     color: "#000",
     textAlign: "left",
+    fontWeight: "600",
   },
   circlesRow: {
     display: "flex",
@@ -182,7 +183,7 @@ const styles = {
     borderRadius: "50%",
   },
   newBetButton: {
-    padding: "12px 24px",
+    padding: "10px 24px",
     margin: "50px 0px",
     backgroundColor: "#3B82F6",
     color: "#fff",
@@ -209,12 +210,10 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "6px",
   },
   headerRight: {
     display: "flex",
     alignItems: "center",
-    gap: "6px", // ריווח בין סטטוס לאייקונים
   },
   cardButton: {
     width: "10px",
@@ -222,12 +221,11 @@ const styles = {
     border: "none",
     cursor: "pointer",
     fontSize: "16px",
-    marginLeft: "6px",  // ✅ ריווח בין כפתורים
   },
   betTitle: {
     color: "#000",
     fontSize: "22px",
-    fontWeight: "600",
+    fontWeight: "500",
     marginBottom: "0px",
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -235,23 +233,19 @@ const styles = {
   },
   betMeta: {
     fontSize: "14px",
+    fontWeight: "400",
     color: "#000",
     marginBottom: "6px",
+    marginTop: "0px",
   },
   progressSection: {
     marginBottom: "6px",
-  },
-  progressLabel: {
-    fontSize: "12px",
-    marginTop: "4px",
-    color: "#475569",
   },
   progressBarContainer: {
     display: "flex",
     flexDirection: "column", // Stack progress bars vertically
     alignItems: "center", // Center horizontally
     justifyContent: "center", // Center vertically
-    gap: "0px", // Adds space between progress bars
     width: "100%",
   },
   progressBar: {
